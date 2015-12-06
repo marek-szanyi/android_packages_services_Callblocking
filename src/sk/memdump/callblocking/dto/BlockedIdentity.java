@@ -17,6 +17,8 @@
 package sk.memdump.callblocking.dto;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * @class Record is a DTO class which holds all the neccesary (and supplementary) data about
@@ -24,8 +26,7 @@ import android.net.Uri;
  *
  * Created by Marek Szanyi
  */
-public class BlockedIdentity
-{
+public class BlockedIdentity implements Parcelable {
 
     /**
      * @brief A unique valid identifier of an entity in a network, this is specific to different
@@ -90,4 +91,31 @@ public class BlockedIdentity
         this.mBlockPeriod = mBlockPeriod;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.mNetworkIdentifier);
+        dest.writeParcelable(this.mContactLookup, 0);
+        dest.writeParcelable(this.mBlockPeriod, flags);
+    }
+
+    protected BlockedIdentity(Parcel in) {
+        this.mNetworkIdentifier = in.readString();
+        this.mContactLookup = in.readParcelable(Uri.class.getClassLoader());
+        this.mBlockPeriod = in.readParcelable(Period.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<BlockedIdentity> CREATOR = new Parcelable.Creator<BlockedIdentity>() {
+        public BlockedIdentity createFromParcel(Parcel source) {
+            return new BlockedIdentity(source);
+        }
+
+        public BlockedIdentity[] newArray(int size) {
+            return new BlockedIdentity[size];
+        }
+    };
 }

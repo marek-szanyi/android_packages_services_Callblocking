@@ -17,6 +17,8 @@
 package sk.memdump.callblocking.dto;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * @class Represents an interval in time. Marks the start and the end plus the
@@ -24,8 +26,7 @@ package sk.memdump.callblocking.dto;
  *
  * @author Marek Szanyi
  */
-public class Period
-{
+public class Period implements Parcelable {
     /**
      * @brief encoded value of a Period which is always on i.e 27/7
      */
@@ -85,6 +86,13 @@ public class Period
         mTimeEnd = (encoded >> 17) & 0x7FF;
     }
 
+    protected Period(Parcel in)
+    {
+        this.mDays = in.readInt();
+        this.mTimeStart = in.readInt();
+        this.mTimeEnd = in.readInt();
+    }
+
     /**
      * @brief encode the actual values into a single int
      * @return an int which contains all information
@@ -139,5 +147,26 @@ public class Period
         return mTimeEnd;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.mDays);
+        dest.writeInt(this.mTimeStart);
+        dest.writeInt(this.mTimeEnd);
+    }
+
+    public static final Parcelable.Creator<Period> CREATOR = new Parcelable.Creator<Period>() {
+        public Period createFromParcel(Parcel source) {
+            return new Period(source);
+        }
+
+        public Period[] newArray(int size) {
+            return new Period[size];
+        }
+    };
 }
 
